@@ -13,10 +13,18 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const server = http.createServer(app);
 
-// CORS
-const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+// CORS — comma-separated for multiple fronts (e.g. Vercel prod + preview)
+function parseClientOrigins() {
+  const raw = process.env.CLIENT_URL || 'http://localhost:5173';
+  const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  return list.length ? list : ['http://localhost:5173'];
+}
+
+const clientOrigins = parseClientOrigins();
+const corsOrigin = clientOrigins.length === 1 ? clientOrigins[0] : clientOrigins;
+
 app.use(cors({
-  origin: clientUrl,
+  origin: corsOrigin,
   credentials: true
 }));
 
@@ -30,7 +38,7 @@ app.use('/api', apiRoutes);
 // Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: clientUrl,
+    origin: corsOrigin,
     methods: ['GET', 'POST'],
     credentials: true
   }
@@ -50,7 +58,7 @@ async function start() {
 
   server.listen(PORT, () => {
     console.log(`\n🎮 Wordle Duel server running on port ${PORT}`);
-    console.log(`🌐 Client URL: ${clientUrl}`);
+    console.log(`🌐 Client URL(s): ${clientOrigins.join(', ')}`);
     console.log(`📡 Socket.IO ready\n`);
   });
 }
