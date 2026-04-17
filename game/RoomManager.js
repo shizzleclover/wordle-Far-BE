@@ -4,9 +4,9 @@ const DEFAULT_GRACE_MS = parseInt(process.env.DISCONNECT_GRACE_MS, 10) || 90_000
 
 class RoomManager {
   constructor() {
-    this.rooms = new Map(); // roomCode -> Room
-    this.socketToRoom = new Map(); // socketId -> roomCode
-    this.forfeitTimers = new Map(); // `${roomCode}:${userId}` -> Timeout
+    this.rooms = new Map();  
+    this.socketToRoom = new Map();  
+    this.forfeitTimers = new Map();  
     this.disconnectGraceMs = DEFAULT_GRACE_MS;
 
     /** @type {{ onPlayingForfeit?: Function, onSetupAbandon?: Function, onOpponentDisconnected?: Function, onOpponentReconnected?: Function } | null} */
